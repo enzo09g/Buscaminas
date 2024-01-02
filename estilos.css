@@ -1,0 +1,62 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header{
+    flex-grow: 0;
+    text-align: center;
+    margin-top: 1.5rem;
+    margin-bottom: 4rem;
+}
+
+main{
+flex-grow: 1;
+align-self: center;
+}
+
+#contenedor{
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.boton{
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+    line-height: 28px;
+    background: url(imagenes/closed.svg);
+}
+
+.boton_opened{
+    background: url(imagenes/opened.svg);
+}
+
+.boton_pressed{
+    background: url(imagenes/clickeado.svg);
+}
+
+.casilla {
+    float: left;
+    background-size: 100%;
+    font-weight: 700;
+    text-align: center
+}
+
+.inputs{
+    width: 3rem;
+}
+
+.filas{
+    /* margin-bottom: 0.1rem; */
+    display: flex;
+    flex-wrap: nowrap;
+}
