@@ -22,6 +22,10 @@ align-self: center;
 }
 
 #contenedor{
+    display: flex;
+    justify-content: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -36,12 +40,48 @@ align-self: center;
     background: url(imagenes/closed.svg);
 }
 
-.boton_opened{
+.boton_pressed{
+    background: url(imagenes/clickeado.svg);
+}
+
+.boton_0{
     background: url(imagenes/opened.svg);
 }
 
-.boton_pressed{
-    background: url(imagenes/clickeado.svg);
+.boton_1{
+    background: url(imagenes/1.svg);
+}
+
+.boton_2{
+    background: url(imagenes/2.svg);
+}
+
+.boton_2{
+    background: url(imagenes/2.svg);
+}
+
+.boton_3{
+    background: url(imagenes/3.svg);
+}
+
+.boton_4{
+    background: url(imagenes/4.svg);
+}
+
+.boton_5{
+    background: url(imagenes/5.svg);
+}
+
+.boton_6{
+    background: url(imagenes/6.svg);
+}
+
+.boton_7{
+    background: url(imagenes/7.svg);
+}
+
+.boton_8{
+    background: url(imagenes/8.svg);
 }
 
 .casilla {

@@ -61,19 +61,61 @@ const crearFila = (columnas, numeroCasilla, arrayMinas, filas) => {
 
 function asignarPosicion(casilla, numeroCasilla, columnas, filas) {
 
-    let esquinas = [1, columnas, columnas*filas, (columnas*filas) - (columnas - 1)]
+    const posiciones = crearPosiciones(columnas, filas)
 
+    const posicion = Object.keys(posiciones).find(key => posiciones[key].includes(numeroCasilla));
 
-    if (numeroCasilla == 1 || numeroCasilla == columnas || numeroCasilla == columnas * filas || numeroCasilla == (columnas * filas) - (columnas - 1)) {
-        casilla.dataset.posicion = "esquina"
+    if (posicion) {
+        casilla.dataset.posicion = posicion;
     }
 
 }
 
+function crearPosiciones(columnasArgumento, filas) {
+    let columnas = parseInt(columnasArgumento)
+    let todasLasCasillas = [];
+
+    let posicion = {};
+    posicion.esquina = [1, columnas, columnas * filas, (columnas * filas) - (columnas - 1)];
+    posicion.norte = [];
+    posicion.sur = [];
+    posicion.oeste = [];
+    posicion.este = [];
+    posicion.centrales = [];
+
+    for (let i = 1; i <= parseInt(filas) * columnas; i++) {
+        todasLasCasillas.push(i)
+    }
+
+    for (i = 2; i < columnas; i++) {
+        posicion.norte.push(i)
+    }
+
+    for (i = posicion.esquina[3] + 1; i < posicion.esquina[2]; i++) {
+        posicion.sur.push(i);
+    }
+
+    for (i = 1 + columnas; i < posicion.esquina[3]; i += columnas) {
+        posicion.oeste.push(i);
+    }
+
+    for (i = columnas * 2; i < posicion.esquina[2]; i += columnas) {
+        posicion.este.push(i);
+    }
+
+    let todoExceptoCentrales = posicion.esquina.concat(posicion.norte, posicion.sur, posicion.oeste, posicion.este)
+
+    posicion.centrales = todasLasCasillas.filter(elemento => !todoExceptoCentrales.includes(elemento));
+
+    return posicion;
+
+}
+
+
 const crearCasilla = (numeroCasilla, arrayMinas, columnas, filas) => {
     let casilla = document.createElement('div');
-    casilla = asignarPosicion(casilla, numeroCasilla, columnas, filas);
 
+    asignarPosicion(casilla, numeroCasilla, columnas, filas);
 
     arrayMinas.includes(numeroCasilla) ? casilla.dataset.mina = true : casilla.dataset.mina = false;
     casilla.dataset.numero = numeroCasilla
@@ -133,7 +175,7 @@ function agregarEventos(numeros) {
 
     const casillas = Array.from(document.getElementsByClassName('casilla'));
     casillas.forEach(casilla => {
-        casilla.addEventListener('click', chequearAlRededor)
+        casilla.addEventListener('click', chequearAlRededor2)
         casilla.addEventListener('click', boton_opened);
         casilla.addEventListener('mousedown', boton_opened);
         casilla.addEventListener('mouseout', boton_opened);
@@ -149,9 +191,9 @@ function boton_opened(event) {
 
 function eventoDeClicks(event) {
     if (event.type == "click") {
-        if (!(event.target.classList.contains('boton_opened'))) {
+        if (!(event.target.classList.contains('boton_0'))) {
             event.target.classList.remove('boton_pressed')
-            event.target.classList.add('boton_opened')
+            event.target.classList.add('boton_0')
         }
         quitarEventos(event)
     }
@@ -182,43 +224,217 @@ function eventoDeClicks(event) {
 
 function quitarEventos(event) {
     event.target.removeEventListener('click', boton_opened)
-    event.target.removeEventListener('click', chequearAlRededor)
+    event.target.removeEventListener('click', chequearAlRededor2)
     event.target.removeEventListener('mousedown', boton_opened)
     event.target.removeEventListener('mouseout', boton_opened)
     event.target.removeEventListener('mouseover', boton_opened)
 }
 
-function check(event, datos) {
-    const casillasNorte = [-datos.columnas, -(datos.columnas - 1), +1, datos.columnas, +(datos.columnas + 1)];
-    const casillasOeste = [-1, +1, (datos.columnas - 1), datos.columnas, +(datos.columnas + 1)]
-    const casillasSur = [-datos.columnas, -(datos.columnas + 1), -1, (datos.columnas - 1), datos.columnas]
-    const casillasEste = [-1, +1, -(datos.columnas - 1), -datos.columnas, -(datos.columnas + 1)]
-    const casillasCentrales = [-(datos.columnas + 1), -(datos.columnas), -(datos.columnas - 1), -1, 1, +(datos.columnas - 1), datos.columnas, +(datos.columnas + 1)];
-    const casillasEsquina1 = [datos.columnas, +1, +(datos.columnas + 1)]
-    const casillasEsquina4 = [-1, (datos.columnas - 1), datos.columnas]
-    const casillasEsquina13 = [+1, -(datos.columnas - 1), -datos.columnas]
-    const casillasEsquina16 = [-1, -datos.columnas, -(datos.columnas + 1)]
-}
+function chequearAlRededor2(evento) {
+    const casillas = Array.from(document.getElementsByClassName('casilla'))
 
-function chequearAlRededor(evento) {
-    const datos = tomarNumeros()
-    const casillasCentrales = [-(parseInt(datos.columnas) + 1), -(parseInt(datos.columnas)), -(parseInt(datos.columnas - 1)), -1, 1, +(parseInt(datos.columnas - 1)), parseInt(datos.columnas), +(parseInt(datos.columnas) + 1)];
-    const casillas = Array.from(document.getElementsByClassName('casilla'));
-    const casillaActual = parseInt((evento.target.dataset.numero - 1));
+    if (evento.target.dataset.posicion == "esquina") {
+        let posicion = tomarNumeros();
+        let columnas = parseInt(posicion.columnas);
+        let filas = parseInt(posicion.filas)
+        let esquinas = [1, columnas, columnas * filas, (columnas * filas) - (columnas - 1)]
 
+        if (evento.target.dataset.numero == esquinas[0]) {
+            let minas = chequearEsquina(evento, casillas, "noroeste");
+            colocarNumero(evento, minas)
 
-    console.log(casillasCentrales)
-
-    for (let i = 0; i < casillasCentrales.length; i++) {
-        let contador = 0;
-        let casilla2 = parseInt(casillaActual) + parseInt(casillasCentrales[i]);
-        console.log(casillaActual + "+" + casillasCentrales[i] + "=" + parseInt(casillaActual) + parseInt(casillasCentrales[i]))
-
-        if (casilla2 < 0) {
-            console.log("menor a 0")
         }
 
+        if (evento.target.dataset.numero == esquinas[1]) {
+            let minas = chequearEsquina(evento, casillas, "noreste");
+            colocarNumero(evento, minas)
+        }
 
-        console.log(casillas[casilla2])
+        if (evento.target.dataset.numero == esquinas[3]) {
+            let minas = chequearEsquina(evento, casillas, "suroeste");
+            colocarNumero(evento, minas)
+        }
+
+        if (evento.target.dataset.numero == esquinas[2]) {
+            let minas = chequearEsquina(evento, casillas, "sureste");
+            colocarNumero(evento, minas)
+        }
+
     }
+
+    if (evento.target.dataset.posicion == "norte") {
+        let minas = chequearNorte(evento, casillas);
+        colocarNumero(evento, minas)
+    }
+
+    if (evento.target.dataset.posicion == "sur") {
+        let minas = chequearSur(evento, casillas);
+        colocarNumero(evento, minas)
+    }
+
+    if (evento.target.dataset.posicion == "centrales") {
+        let minas = chequearCentrales(evento, casillas);
+        colocarNumero(evento, minas)
+    }
+
+    if (evento.target.dataset.posicion == "oeste") {
+        let minas = chequearOeste(evento, casillas);
+        colocarNumero(evento, minas)
+    }
+
+    if (evento.target.dataset.posicion == "este") {
+        let minas = chequearEste(evento, casillas);
+        colocarNumero(evento, minas)
+    }
+}
+
+function chequearEsquina(evento, casillas, esquina) {
+    let numeros = tomarNumeros()
+    let columnas = parseInt(numeros.columnas)
+
+    console.log(columnas)
+
+    let arrayNoroeste = [+1, +columnas, +(columnas + 1)]
+    let arrayNoreste = [-1, +columnas, +(columnas - 1)]
+    let arraySuroeste = [+1, -columnas, -(columnas - 1)]
+    let arraySureste = [-1, -columnas, -(columnas + 1)]
+
+    let casillaActual = evento.target.dataset.numero - 1;
+    let contador = 0;
+
+    switch (esquina) {
+        case "noroeste":
+
+            for (let i = 0; i < arrayNoroeste.length; i++) {
+                let casillaAdyacente = casillaActual + arrayNoroeste[i];
+                if (casillas[casillaAdyacente].dataset.mina == "true") {
+                    contador++;
+                }
+            }
+
+            break;
+
+        case "noreste":
+
+            for (let i = 0; i < arrayNoroeste.length; i++) {
+                let casillaAdyacente = casillaActual + arrayNoreste[i];
+                if (casillas[casillaAdyacente].dataset.mina == "true") {
+                    contador++;
+                }
+            }
+
+            break;
+
+        case "suroeste":
+
+            for (let i = 0; i < arrayNoroeste.length; i++) {
+                let casillaAdyacente = casillaActual + arraySuroeste[i];
+                if (casillas[casillaAdyacente].dataset.mina == "true") {
+                    contador++;
+                }
+            }
+
+            break;
+
+        case "sureste":
+
+            for (let i = 0; i < arrayNoroeste.length; i++) {
+                let casillaAdyacente = casillaActual + arraySureste[i];
+                if (casillas[casillaAdyacente].dataset.mina == "true") {
+                    contador++;
+                }
+            }
+
+            break;
+    }
+
+    return contador;
+}
+
+function chequearCentrales(evento, casillas) {
+    let numeros = tomarNumeros()
+    let columnas = parseInt(numeros.columnas)
+
+    let casillaActual = evento.target.dataset.numero - 1;
+    let contador = 0;
+    let array = [+columnas, +1, -1, +(columnas - 1), +(columnas + 1), -columnas, -(columnas - 1), -(columnas + 1)]
+
+    for (let i = 0; i < array.length; i++) {
+        let casillaAdyacente = casillaActual + array[i];
+        if (casillas[casillaAdyacente].dataset.mina == "true") {
+            contador++;
+        }
+    }
+    return contador;
+}
+
+let centrales = [+columnas, -columnas, +1, -1,]
+
+function chequearNorte(evento, casillas) {
+    let numeros = tomarNumeros()
+    let columnas = parseInt(numeros.columnas)
+    let casillaActual = evento.target.dataset.numero - 1;
+    let contador = 0;
+    let array = [+columnas, +1, -1, +(columnas - 1), +(columnas + 1)]
+
+    for (let i = 0; i < array.length; i++) {
+        let casillaAdyacente = casillaActual + array[i];
+        if (casillas[casillaAdyacente].dataset.mina == "true") {
+            contador++;
+        }
+    }
+    return contador;
+}
+
+function chequearSur(evento, casillas) {
+    let numeros = tomarNumeros()
+    let columnas = parseInt(numeros.columnas)
+    let casillaActual = evento.target.dataset.numero - 1;
+    let contador = 0;
+    let array = [+1, -1, -columnas, -(columnas + 1), -(columnas - 1)]
+
+    for (let i = 0; i < array.length; i++) {
+        let casillaAdyacente = casillaActual + array[i];
+        if (casillas[casillaAdyacente].dataset.mina == "true") {
+            contador++;
+        }
+    }
+    return contador;
+
+}
+
+function chequearOeste(evento, casillas) {
+    let numeros = tomarNumeros()
+    let columnas = parseInt(numeros.columnas)
+    let casillaActual = evento.target.dataset.numero - 1;
+    let contador = 0;
+    let array = [-columnas, +columnas, +1, -(columnas - 1), +(columnas + 1)]
+
+    for (let i = 0; i < array.length; i++) {
+        let casillaAdyacente = casillaActual + array[i];
+        if (casillas[casillaAdyacente].dataset.mina == "true") {
+            contador++;
+        }
+    }
+    return contador;
+}
+
+function chequearEste(evento, casillas) {
+    let numeros = tomarNumeros()
+    let columnas = parseInt(numeros.columnas)
+    let casillaActual = evento.target.dataset.numero - 1;
+    let contador = 0;
+    let array = [-columnas, +columnas, -1, +(columnas - 1), -(columnas + 1)]
+
+    for (let i = 0; i < array.length; i++) {
+        let casillaAdyacente = casillaActual + array[i];
+        if (casillas[casillaAdyacente].dataset.mina == "true") {
+            contador++;
+        }
+    }
+    return contador;
+}
+
+function colocarNumero(evento, minas) {
+    evento.target.classList.add(`boton_${minas}`)
 }
