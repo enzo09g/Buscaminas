@@ -1,0 +1,5 @@
+ideas funcion sinMina()
+
+
+Crear una array que vaya almacenando los numeros de las casillas sin minas, para ejecutar los clicks uno por uno, en lugar
+ de hacerlos todos juntos
