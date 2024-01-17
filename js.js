@@ -180,6 +180,7 @@ function agregarEventos(numeros) {
         casilla.addEventListener('click', chequearAlRededor)
         casilla.addEventListener('mouseout', eventoDeClicks);
         casilla.addEventListener('mouseover', eventoDeClicks);
+        casilla.addEventListener('contextmenu', eventoDeClicks);
     })
     document.addEventListener('mousedown', eventoDeClicks);
     document.addEventListener('mouseup', eventoDeClicks)
@@ -214,12 +215,22 @@ function eventoDeClicks(event) {
         event.target.click()
         mouseDown = false;
     }
+
+    if(event.type == "contextmenu"){
+        event.preventDefault();
+        event.target.classList.toggle('boton_flag')
+    }
+}
+
+function colocarBandera(evento){
+
 }
 
 function quitarEventos(objetivo) {
     objetivo.removeEventListener('click', chequearAlRededor)
     objetivo.removeEventListener('mouseout', eventoDeClicks)
     objetivo.removeEventListener('mouseover', eventoDeClicks)
+    // objetivo.removeEventListener('contextmenu', eventoDeClicks)
 }
 
 function parche(evento) {
