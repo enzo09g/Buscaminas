@@ -96,7 +96,7 @@ align-self: center;
 }
 
 .boton_flag{
-    background: url(imagenes/flag.svg);
+    background: url(imagenes/flag.svg)
 }
 
 .casilla {
