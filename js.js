@@ -191,9 +191,11 @@ let mouseDown = false;
 function eventoDeClicks(event) {
 
     if (event.type == 'mousedown') {
-        mouseDown = true;
-        if (event.target.classList.contains('casilla')) {
-            event.target.classList.add('boton_pressed')
+        if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
+            mouseDown = true;
+            if (event.target.classList.contains('casilla')) {
+                event.target.classList.add('boton_pressed')
+            }
         }
     }
 
@@ -212,17 +214,20 @@ function eventoDeClicks(event) {
     }
 
     if (event.type == 'mouseup') {
-        event.target.click()
         mouseDown = false;
+        if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
+            event.target.click()
+        }
     }
 
-    if(event.type == "contextmenu"){
+    if (event.type == "contextmenu") {
+        console.log(event)
         event.preventDefault();
         event.target.classList.toggle('boton_flag')
     }
 }
 
-function colocarBandera(evento){
+function colocarBandera(evento) {
 
 }
 
@@ -230,7 +235,7 @@ function quitarEventos(objetivo) {
     objetivo.removeEventListener('click', chequearAlRededor)
     objetivo.removeEventListener('mouseout', eventoDeClicks)
     objetivo.removeEventListener('mouseover', eventoDeClicks)
-    // objetivo.removeEventListener('contextmenu', eventoDeClicks)
+    objetivo.removeEventListener('contextmenu', eventoDeClicks)
 }
 
 function parche(evento) {
@@ -239,75 +244,76 @@ function parche(evento) {
 }
 
 function chequearAlRededor(evento) {
-    parche(evento.target)
-    // quitarEventos(evento.target)
-    // evento.target.classList.remove('boton_closed')
-    if (evento.target.dataset.mina == "true") { // Si tiene mina coloca  mine red y explosion
-        explosion(evento)
-    } else {                                    // Si no tiene mina chequea la posicion para poder contar las minas al rededor correctamente.
-        const casillas = Array.from(document.getElementsByClassName('casilla'))
+    if (!evento.target.classList.contains('boton_flag')) {
 
-        if (evento.target.dataset.posicion == "esquina") {
-            let posicion = tomarNumeros();
-            let columnas = parseInt(posicion.columnas);
-            let filas = parseInt(posicion.filas)
-            let esquinas = [1, columnas, columnas * filas, (columnas * filas) - (columnas - 1)]
+        parche(evento.target)
+        if (evento.target.dataset.mina == "true") { // Si tiene mina coloca  mine red y explosion
+            explosion(evento)
+        } else {                                    // Si no tiene mina chequea la posicion para poder contar las minas al rededor correctamente.
+            const casillas = Array.from(document.getElementsByClassName('casilla'))
 
-            if (evento.target.dataset.numero == esquinas[0]) {
-                let minas = chequearEsquina(evento, casillas, "noroeste");
-                minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
-                colocarNumero(evento, minas.contador)
+            if (evento.target.dataset.posicion == "esquina") {
+                let posicion = tomarNumeros();
+                let columnas = parseInt(posicion.columnas);
+                let filas = parseInt(posicion.filas)
+                let esquinas = [1, columnas, columnas * filas, (columnas * filas) - (columnas - 1)]
+
+                if (evento.target.dataset.numero == esquinas[0]) {
+                    let minas = chequearEsquina(evento, casillas, "noroeste");
+                    minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
+                    colocarNumero(evento, minas.contador)
+
+                }
+
+                if (evento.target.dataset.numero == esquinas[1]) {
+                    let minas = chequearEsquina(evento, casillas, "noreste");
+                    minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
+                    colocarNumero(evento, minas.contador)
+                }
+
+                if (evento.target.dataset.numero == esquinas[3]) {
+                    let minas = chequearEsquina(evento, casillas, "suroeste");
+                    minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
+                    colocarNumero(evento, minas.contador)
+                }
+
+                if (evento.target.dataset.numero == esquinas[2]) {
+                    let minas = chequearEsquina(evento, casillas, "sureste");
+                    minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
+                    colocarNumero(evento, minas.contador)
+                }
 
             }
 
-            if (evento.target.dataset.numero == esquinas[1]) {
-                let minas = chequearEsquina(evento, casillas, "noreste");
+            if (evento.target.dataset.posicion == "norte") {
+                let minas = chequearNorte(evento, casillas);
                 minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
                 colocarNumero(evento, minas.contador)
             }
 
-            if (evento.target.dataset.numero == esquinas[3]) {
-                let minas = chequearEsquina(evento, casillas, "suroeste");
+            if (evento.target.dataset.posicion == "sur") {
+                let minas = chequearSur(evento, casillas);
                 minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
                 colocarNumero(evento, minas.contador)
             }
 
-            if (evento.target.dataset.numero == esquinas[2]) {
-                let minas = chequearEsquina(evento, casillas, "sureste");
+            if (evento.target.dataset.posicion == "centrales") {
+                let minas = chequearCentrales(evento, casillas);
                 minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
                 colocarNumero(evento, minas.contador)
             }
 
-        }
+            if (evento.target.dataset.posicion == "oeste") {
+                let minas = chequearOeste(evento, casillas);
+                minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
+                colocarNumero(evento, minas.contador)
+            }
 
-        if (evento.target.dataset.posicion == "norte") {
-            let minas = chequearNorte(evento, casillas);
-            minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
-            colocarNumero(evento, minas.contador)
-        }
-
-        if (evento.target.dataset.posicion == "sur") {
-            let minas = chequearSur(evento, casillas);
-            minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
-            colocarNumero(evento, minas.contador)
-        }
-
-        if (evento.target.dataset.posicion == "centrales") {
-            let minas = chequearCentrales(evento, casillas);
-            minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
-            colocarNumero(evento, minas.contador)
-        }
-
-        if (evento.target.dataset.posicion == "oeste") {
-            let minas = chequearOeste(evento, casillas);
-            minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
-            colocarNumero(evento, minas.contador)
-        }
-
-        if (evento.target.dataset.posicion == "este") {
-            let minas = chequearEste(evento, casillas);
-            minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
-            colocarNumero(evento, minas.contador)
+            if (evento.target.dataset.posicion == "este") {
+                let minas = chequearEste(evento, casillas);
+                minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
+                colocarNumero(evento, minas.contador)
+            }
         }
     }
 }
@@ -496,28 +502,6 @@ function sinMinas(evento, array) {
         }
     }
 }
-
-// async function sinMinas(evento, array) {
-//     let casillaActual = parseInt(evento.target.dataset.numero) - 1
-//     const casillas = Array.from(document.getElementsByClassName('casilla'));
-//     const clasesExcluidas = ['boton_0', 'boton_1', 'boton_2', 'boton_3', 'boton_4', 'boton_5', 'boton_6', 'boton_7', 'boton_8', 'boton_pressed'];
-
-//     for (let i = 0; i < array.length; i++) {
-//         let casillaAdyacente = casillaActual + array[i];
-
-//         if (casillas[casillaAdyacente].classList.contains('boton_closed')) {
-//             await new Promise(resolve =>{
-//                 casillas[casillaAdyacente].click()
-//                 console.log("contiene")
-//                 setTimeout(resolve, 3000);
-//             })
-//         }else{
-//         }
-//         // if (casillas[casillaAdyacente] && !clasesExcluidas.some(clase => casillas[casillaAdyacente].classList.contains(clase))) {
-//         //     console.log(casillas[casillaAdyacente])
-//         // }
-//     }
-// }
 
 function explosion(evento) {
     document.removeEventListener('mousedown', eventoDeClicks)
