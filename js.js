@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function crearYVaciarTablero() {
     console.clear()
+    comienzoDePartida();
     const contenedor = document.querySelector('#contenedor');
     contenedor.firstChild ? contenedor.firstChild.remove() : contenedor;
 
@@ -191,6 +192,7 @@ function agregarEventos(numeros) {
     })
 }
 
+let clicks = 0;
 let mouseDown = false;
 
 function eventoDeClicks(event) {
@@ -245,16 +247,20 @@ function parche(evento) {
 }
 
 function chequearAlRededor(evento) {
+
     if (!evento.target.classList.contains('boton_flag')) {
 
         parche(evento.target)
+        clicks++;
+        let posicion = tomarNumeros();
+        finDePartida(posicion);
+      
         if (evento.target.dataset.mina == "true") { // Si tiene mina coloca  mine red y explosion
             explosion(evento)
         } else {                                    // Si no tiene mina chequea la posicion para poder contar las minas al rededor correctamente.
             const casillas = Array.from(document.getElementsByClassName('casilla'))
 
             if (evento.target.dataset.posicion == "esquina") {
-                let posicion = tomarNumeros();
                 let columnas = parseInt(posicion.columnas);
                 let filas = parseInt(posicion.filas)
                 let esquinas = [1, columnas, columnas * filas, (columnas * filas) - (columnas - 1)]
@@ -283,6 +289,7 @@ function chequearAlRededor(evento) {
                     minas.contador == 0 ? sinMinas(evento, minas.array) : minas.contador
                     colocarNumero(evento, minas.contador)
                 }
+
 
             }
 
@@ -516,4 +523,30 @@ function explosion(evento) {
     })
     evento.target.classList.remove('boton_mine')
     evento.target.classList.add('boton_9')
+}
+
+function comienzoDePartida() {
+    clicks = 0;
+}
+
+function finDePartida(numeros) {
+
+    const casillas = (parseInt(numeros.columnas) * parseInt(numeros.filas)) - parseInt(numeros.minas);
+    if (clicks == casillas) {
+        victoria();
+    }
+}
+
+function victoria() {
+    const casillas = Array.from(document.getElementsByClassName('casilla'));
+
+    casillas.forEach(elemento => {
+        quitarEventos(elemento);
+        document.removeEventListener('mouseup', eventoDeClicks);
+        document.removeEventListener('mousedown', eventoDeClicks);
+        if (elemento.classList.contains('boton_closed')) {
+            elemento.classList.remove('boton_closed');
+            elemento.classList.add('boton_flag');
+        }
+    })
 }
