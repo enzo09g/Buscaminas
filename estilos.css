@@ -95,6 +95,10 @@ align-self: center;
     background: url(imagenes/mine_black.svg);
 }
 
+.boton_flag{
+    background: url(imagenes/flag.svg);
+}
+
 .casilla {
     float: left;
     background-size: 100%;
