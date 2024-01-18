@@ -184,6 +184,11 @@ function agregarEventos(numeros) {
     })
     document.addEventListener('mousedown', eventoDeClicks);
     document.addEventListener('mouseup', eventoDeClicks)
+
+    const contenedor = document.getElementById('contenedor');
+    contenedor.addEventListener('contextmenu', (evento) => {
+        evento.preventDefault();
+    })
 }
 
 let mouseDown = false;
@@ -225,10 +230,6 @@ function eventoDeClicks(event) {
         event.preventDefault();
         event.target.classList.toggle('boton_flag')
     }
-}
-
-function colocarBandera(evento) {
-
 }
 
 function quitarEventos(objetivo) {
