@@ -199,7 +199,7 @@ function eventoDeClicks(event) {
     const numeros = tomarNumeros()
 
     if (event.type == 'mousedown') {
-        if (event.button == 2) {
+        if (event.button == 2 && event.target.classList.contains('boton_closed')) {
             event.target.classList.toggle('boton_flag')
         }
         if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
