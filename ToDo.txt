@@ -3,3 +3,7 @@ ideas funcion sinMina()
 
 Crear una array que vaya almacenando los numeros de las casillas sin minas, para ejecutar los clicks uno por uno, en lugar
  de hacerlos todos juntos
+
+
+ En vez de dar click en las casillas adyacentes, colocarle los numeros y chequear si tienen minas. Almacenar en una variable que 
+ se vaya actualizando y con un while cuando halla una mina que la funcion se pare.
