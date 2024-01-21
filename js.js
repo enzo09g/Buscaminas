@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function crearYVaciarTablero() {
     console.clear()
-    comienzoDePartida();
     const contenedor = document.querySelector('#contenedor');
     contenedor.firstChild ? contenedor.firstChild.remove() : contenedor;
 
@@ -178,7 +177,7 @@ function agregarEventos(numeros) {
 
     const casillas = Array.from(document.getElementsByClassName('casilla'));
     casillas.forEach(casilla => {
-        casilla.addEventListener('click', eventoClickHandler)
+        casilla.addEventListener('click', generarChequeo)
         casilla.addEventListener('mouseout', eventoDeClicks);
         casilla.addEventListener('mouseover', eventoDeClicks);
         casilla.addEventListener('contextmenu', eventoDeClicks);
@@ -192,7 +191,6 @@ function agregarEventos(numeros) {
     })
 }
 
-let clicks = 0;
 let mouseDown = false;
 
 function eventoDeClicks(event) {
@@ -234,7 +232,7 @@ function eventoDeClicks(event) {
 }
 
 function quitarEventos(objetivo) {
-    objetivo.removeEventListener('click', eventoClickHandler)
+    objetivo.removeEventListener('click', generarChequeo)
     objetivo.removeEventListener('mouseout', eventoDeClicks)
     objetivo.removeEventListener('mouseover', eventoDeClicks)
     objetivo.removeEventListener('contextmenu', eventoDeClicks)
@@ -256,15 +254,15 @@ function chequearAlRededor(evento, casillaCondicion) {
 
 function functionCasillaCondicion(evento, casillaCondicion) {
     let target = event[evento] || casillaCondicion
+    let estadoDelJuego = false;
     if (!target.classList.contains('boton_flag')) {
 
         parche(target)
 
         let posicion = tomarNumeros();
-        finDePartida(posicion.minas);
-
         if (target.dataset.mina == "true") { // Si tiene mina coloca  mine red y explosion
             explosion(target)
+            estadoDelJuego = true;
         } else {                                    // Si no tiene mina chequea la posicion para poder contar las minas al rededor correctamente.
             const casillas = Array.from(document.getElementsByClassName('casilla'))
 
@@ -331,6 +329,9 @@ function functionCasillaCondicion(evento, casillaCondicion) {
                 colocarNumero(target, minas.contador)
             }
         }
+
+        finDePartida(posicion.minas, estadoDelJuego);
+
     }
 }
 
@@ -540,15 +541,14 @@ function explosion(evento) {
     evento.classList.add('boton_9')
 }
 
-function comienzoDePartida() {
-    clicks = 0;
-}
 
-function finDePartida(minas) {
+function finDePartida(minas, boolean) {
 
-    const casillas = Array.from(document.getElementsByClassName('boton_closed'))
-    if (casillas.length == parseInt(minas)) {
-        victoria();
+    if (!boolean) {
+        const casillas = Array.from(document.getElementsByClassName('boton_closed'))
+        if (casillas.length == parseInt(minas)) {
+            victoria();
+        }
     }
 }
 
@@ -567,10 +567,10 @@ function victoria() {
 }
 
 
-function generarEventoClickHandler(target) {
+function crearFuncionChequeoAlRededor(target) {
     return function () {
         chequearAlRededor(target);
     }
 }
 
-const eventoClickHandler = generarEventoClickHandler("target");
+const generarChequeo = crearFuncionChequeoAlRededor("target");
