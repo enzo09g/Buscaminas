@@ -99,6 +99,10 @@ align-self: center;
     background: url(imagenes/flag.svg)
 }
 
+.boton_wrong{
+    background: url(imagenes/mine_wrong.svg);
+}
+
 .casilla {
     float: left;
     background-size: 100%;
