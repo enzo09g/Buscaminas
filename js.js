@@ -242,7 +242,7 @@ function eventoMouseOver(event, casillas, numeros) {
         if (!(event.target.classList.contains('boton_pressed'))) {
             event.target.classList.add('boton_pressed')
         }
-        if(!event.target.classList.contains('boton_closed')){
+        if (!event.target.classList.contains('boton_closed')) {
             let minas = chequearMinas(event.target, casillas, numeros)
             let array = sinMinas(event.target, minas.array)
             marcarCasillasPresionadas(array, "add")
@@ -676,7 +676,7 @@ function explosion(evento) {
 
 
     casillas.forEach(elemento => {
-        if(elemento.classList.contains('boton_flag') && elemento.dataset.mina == "false"){
+        if (elemento.classList.contains('boton_flag') && elemento.dataset.mina == "false") {
             elemento.classList.add('boton_wrong')
         }
         elemento.dataset.mina == "true" ? elemento.classList.add('boton_mine') : elemento.dataset.mina
