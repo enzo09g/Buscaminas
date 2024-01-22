@@ -191,6 +191,75 @@ function agregarEventos(numeros) {
     })
 }
 
+function eventoMouseDown(event, casillas, numeros) {
+    if (event.button == 2 && event.target.classList.contains('boton_closed')) {
+        event.target.classList.toggle('boton_flag')
+    }
+    if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
+        if (event.target.classList.contains('casilla')) {
+            event.target.classList.add('boton_pressed')
+        }
+        if (!event.target.classList.contains('boton_closed')) {
+            let minas = chequearMinas(event.target, casillas, numeros)
+            let array = sinMinas(event.target, minas.array)
+            marcarCasillasPresionadas(array, "add")
+        }
+        mouseDown = true;
+    }
+}
+
+function eventoMouseUp(event, casillas, numeros) {
+    mouseDown = false;
+
+    let minas = chequearMinas(event.target, casillas, numeros)
+    let array = sinMinas(event.target, minas.array)
+    marcarCasillasPresionadas(array)
+
+
+    if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
+        event.target.click()
+    }
+    if (event.target.dataset.nMinas && minas.banderas) {
+        if (event.target.dataset.nMinas == minas.banderas)
+            expansion(sinMinas(event.target, minas.array), minas.contador, minas.banderas)
+    }
+}
+
+function eventoMouseOut(event, casillas, numeros) {
+    if (mouseDown) {
+        if (event.target.classList.contains('boton_pressed')) {
+            event.target.classList.remove('boton_pressed')
+        }
+        let pressed = Array.from(document.getElementsByClassName('boton_pressed'))
+        pressed.forEach(elemento => {
+            elemento.classList.remove('boton_pressed')
+        })
+    }
+}
+
+function eventoMouseOver(event, casillas, numeros) {
+    if (mouseDown) {
+        if (!(event.target.classList.contains('boton_pressed'))) {
+            event.target.classList.add('boton_pressed')
+        }
+        let minas = chequearMinas(event.target, casillas, numeros)
+        let array = sinMinas(event.target, minas.array)
+        marcarCasillasPresionadas(array, "add")
+    }
+}
+
+function marcarCasillasPresionadas(array, string) {
+    if (string) {
+        array.forEach(elemento => {
+            elemento.classList.add('boton_pressed')
+        })
+    } else {
+        array.forEach(elemento => {
+            elemento.classList.remove('boton_pressed')
+        })
+    }
+}
+
 let mouseDown = false;
 
 function eventoDeClicks(event) {
@@ -199,44 +268,19 @@ function eventoDeClicks(event) {
     const numeros = tomarNumeros()
 
     if (event.type == 'mousedown') {
-        if (event.button == 2 && event.target.classList.contains('boton_closed')) {
-            event.target.classList.toggle('boton_flag')
-        }
-        if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
-            if (event.target.classList.contains('casilla')) {
-                event.target.classList.add('boton_pressed')
-            }
-            mouseDown = true;
-        }
+        eventoMouseDown(event, casillas, numeros)
     }
 
     if (event.type == 'mouseout') {
-        if (mouseDown) {
-            if (event.target.classList.contains('boton_pressed'))
-                event.target.classList.remove('boton_pressed')
-        }
+        eventoMouseOut(event)
     }
 
     if (event.type == 'mouseover') {
-        if (mouseDown) {
-            if (!(event.target.classList.contains('boton_pressed')))
-                event.target.classList.add('boton_pressed')
-        }
+        eventoMouseOver(event, casillas, numeros)
     }
 
     if (event.type == 'mouseup') {
-        mouseDown = false;
-        let minas = chequearMinas(event.target, casillas, numeros)
-
-
-        if (event.button == 0 && !event.target.classList.contains('boton_flag')) {
-            event.target.click()
-        }
-        if (event.target.dataset.nMinas && minas.banderas) {
-            if (event.target.dataset.nMinas == minas.banderas)
-                console.log(sinMinas(event.target, minas.array))
-            expansion(sinMinas(event.target, minas.array), minas.contador, minas.banderas)
-        }
+        eventoMouseUp(event, casillas, numeros)
     }
 
     if (event.type == "contextmenu") {
@@ -245,14 +289,15 @@ function eventoDeClicks(event) {
 }
 
 function quitarEventos(objetivo) {
-    objetivo.removeEventListener('click', generarChequeo)
-    objetivo.removeEventListener('mouseout', eventoDeClicks)
-    objetivo.removeEventListener('mouseover', eventoDeClicks)
-    objetivo.removeEventListener('contextmenu', eventoDeClicks)
+    if (objetivo.classList.contains('boton_0')) {
+        objetivo.removeEventListener('click', generarChequeo)
+        objetivo.removeEventListener('mouseout', eventoDeClicks)
+        objetivo.removeEventListener('mouseover', eventoDeClicks)
+        objetivo.removeEventListener('contextmenu', eventoDeClicks)
+    }
 }
 
 function parche(evento) {
-    quitarEventos(evento)
     evento.classList.remove('boton_closed')
 }
 
@@ -281,6 +326,7 @@ function functionCasillaCondicion(evento, casillaCondicion) {
             chequearMinas(target, casillas, posicion, true)
             finDePartida(posicion.minas, estadoDelJuego);
         }
+        quitarEventos(target)
     }
 
 
@@ -300,8 +346,6 @@ function chequearMinas(target, casillas, posicion, boolean) {
                 expansion(sinMinas(target, minas.array), minas.contador)
                 colocarNumero(target, minas.contador)
             }
-
-
         }
 
         if (target.dataset.numero == esquinas[1]) {
